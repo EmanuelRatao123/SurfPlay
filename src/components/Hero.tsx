@@ -3,9 +3,10 @@ import { Compass, Flame, ShieldCheck, Zap, Sparkles, Play, Gamepad2 } from 'luci
 
 interface HeroProps {
   onOpenControls: () => void;
+  onOpenSupport: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenControls }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenControls, onOpenSupport }) => {
   const scrollToMaps = () => {
     const mapsSection = document.getElementById('mapas');
     if (mapsSection) {
@@ -49,7 +50,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenControls }) => {
         </p>
 
         {/* Call to Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-14">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto mb-14">
           <button
             onClick={scrollToMaps}
             className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-black text-base tracking-wider uppercase text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 ring-1 ring-cyan-300/40 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 group cursor-pointer"
@@ -66,6 +67,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenControls }) => {
           >
             <Gamepad2 size={18} className="text-cyan-400" />
             <span>COMO JOGAR</span>
+          </button>
+
+          <button
+            onClick={onOpenSupport}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-4 rounded-2xl font-bold text-sm tracking-wide text-sky-300 hover:text-white bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/40 shadow-md backdrop-blur-sm transition-all duration-300 cursor-pointer"
+            aria-label="Abrir suporte"
+          >
+            <span>SUPORTE</span>
           </button>
         </div>
 

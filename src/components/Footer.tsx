@@ -1,6 +1,7 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { ShieldAlert, Heart, Compass } from 'lucide-react';
+import { SUBWAY_MAPS } from '../data/maps';
 
 interface FooterProps {
   onOpenControls: () => void;
@@ -105,39 +106,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenControls }) => {
               Edições em Destaque
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li>
-                <a
-                  href="https://morrowplay.com/play/subway-surfers/barcelona/?edition=barcelona&mode=original"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <Compass size={14} className="text-cyan-500" />
-                  Subway Surfers: Barcelona
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://morrowplay.com/play/subway-surfers/classic/?edition=classic&mode=original"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <Compass size={14} className="text-sky-500" />
-                  Subway Surfers: Classic
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://morrowplay.com/play/subway-surfers/brawl-stars-season/?edition=brawl-stars-season&mode=original"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <Compass size={14} className="text-purple-500" />
-                  Subway Surfers: Brawl Stars
-                </a>
-              </li>
+              {SUBWAY_MAPS.slice(0, 5).map((m) => (
+                <li key={m.id}>
+                  <a
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <Compass size={14} className="text-cyan-500 shrink-0" />
+                    <span>Subway Surfers: {m.name}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
