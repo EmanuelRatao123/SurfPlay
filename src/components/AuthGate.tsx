@@ -9,7 +9,7 @@ export interface AuthUser {
 }
 
 interface AuthGateProps {
-  onLoginSuccess: (user: AuthUser) => void;
+  onLoginSuccess: (user: AuthUser, token?: string) => void;
 }
 
 export const AuthGate: React.FC<AuthGateProps> = ({ onLoginSuccess }) => {
@@ -53,7 +53,7 @@ export const AuthGate: React.FC<AuthGateProps> = ({ onLoginSuccess }) => {
         throw new Error(data.error || 'Falha na autenticação.');
       }
 
-      onLoginSuccess(data.user);
+      onLoginSuccess(data.user, data.token);
     } catch (err: any) {
       setError(err.message || 'Erro de conexão com o servidor.');
     } finally {

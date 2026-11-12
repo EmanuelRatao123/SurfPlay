@@ -6,9 +6,15 @@ interface SupportModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: AuthUser | null;
+  authToken?: string | null;
 }
 
-export const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose, currentUser }) => {
+export const SupportModal: React.FC<SupportModalProps> = ({
+  isOpen,
+  onClose,
+  currentUser,
+  authToken,
+}) => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [senderName, setSenderName] = useState(currentUser?.username || '');
@@ -24,9 +30,14 @@ export const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose, cur
     setLoading(true);
 
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch('/api/support', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           senderName: senderName.trim() || currentUser?.username || 'Anônimo',
           senderUserId: currentUser?.id,

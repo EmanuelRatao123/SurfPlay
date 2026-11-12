@@ -21,6 +21,14 @@ export default function App() {
     }
   });
 
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('surfplay_token');
+    } catch {
+      return null;
+    }
+  });
+
   const [controlsOpen, setControlsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [adminMailboxOpen, setAdminMailboxOpen] = useState(false);
@@ -38,15 +46,14 @@ export default function App() {
     }
   });
 
-  // Keep track of admin messages if current user is Ratão
+  // Keep track of admin messages if current user is Ratão (using signed JWT authorization)
   useEffect(() => {
-    if (currentUser?.role === 'admin') {
+    if (currentUser?.role === 'admin' && authToken) {
       const checkMessages = async () => {
         try {
           const res = await fetch('/api/admin/messages', {
             headers: {
-              'x-admin-user': currentUser.username,
-              'x-admin-role': currentUser.role,
+              Authorization: `Bearer ${authToken}`,
             },
           });
           if (res.ok) {
@@ -65,7 +72,7 @@ export default function App() {
     } else {
       setUnreadAdminCount(0);
     }
-  }, [currentUser]);
+  }, [currentUser, authToken]);
 
   useEffect(() => {
     try {
@@ -75,8 +82,16 @@ export default function App() {
     }
   }, [favorites]);
 
-  const handleLoginSuccess = (user: AuthUser) => {
+  const handleLoginSuccess = (user: AuthUser, token?: string) => {
     setCurrentUser(user);
+    if (token) {
+      setAuthToken(token);
+      try {
+        localStorage.setItem('surfplay_token', token);
+      } catch (e) {
+        console.warn('Failed to save auth token', e);
+      }
+    }
     try {
       localStorage.setItem('surfplay_user', JSON.stringify(user));
     } catch (e) {
@@ -86,8 +101,10 @@ export default function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setAuthToken(null);
     try {
       localStorage.removeItem('surfplay_user');
+      localStorage.removeItem('surfplay_token');
     } catch (e) {
       console.warn('Failed to remove user session', e);
     }
@@ -159,19 +176,21 @@ export default function App() {
             onClose={() => setControlsOpen(false)}
           />
 
-          {/* Support Modal (Message sent to Ratão) */}
+          {/* Support Modal */}
           <SupportModal
             isOpen={supportOpen}
             onClose={() => setSupportOpen(false)}
             currentUser={currentUser}
+            authToken={authToken}
           />
 
-          {/* Admin Mailbox Modal (Exclusive to Ratão) */}
-          {currentUser?.role === 'admin' && (
+          {/* Admin Mailbox Modal (Exclusive to authenticated admin) */}
+          {currentUser?.role === 'admin' && authToken && (
             <AdminMailboxModal
               isOpen={adminMailboxOpen}
               onClose={() => setAdminMailboxOpen(false)}
               currentUser={currentUser}
+              authToken={authToken}
               onUnreadChange={(count) => setUnreadAdminCount(count)}
             />
           )}

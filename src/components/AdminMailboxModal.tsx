@@ -17,6 +17,7 @@ interface AdminMailboxModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: AuthUser | null;
+  authToken: string;
   onUnreadChange?: (unreadCount: number) => void;
 }
 
@@ -24,6 +25,7 @@ export const AdminMailboxModal: React.FC<AdminMailboxModalProps> = ({
   isOpen,
   onClose,
   currentUser,
+  authToken,
   onUnreadChange,
 }) => {
   const [messages, setMessages] = useState<SupportMessageItem[]>([]);
@@ -33,7 +35,7 @@ export const AdminMailboxModal: React.FC<AdminMailboxModalProps> = ({
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   const fetchMessages = async () => {
-    if (!currentUser || currentUser.role !== 'admin') return;
+    if (!currentUser || currentUser.role !== 'admin' || !authToken) return;
 
     setLoading(true);
     setError(null);
@@ -41,8 +43,7 @@ export const AdminMailboxModal: React.FC<AdminMailboxModalProps> = ({
     try {
       const response = await fetch('/api/admin/messages', {
         headers: {
-          'x-admin-user': currentUser.username,
-          'x-admin-role': currentUser.role,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -69,12 +70,12 @@ export const AdminMailboxModal: React.FC<AdminMailboxModalProps> = ({
   }, [isOpen]);
 
   const handleMarkAsRead = async (id: number) => {
+    if (!authToken) return;
     try {
       await fetch(`/api/admin/messages/${id}/read`, {
         method: 'PATCH',
         headers: {
-          'x-admin-user': currentUser?.username || '',
-          'x-admin-role': currentUser?.role || '',
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -94,14 +95,14 @@ export const AdminMailboxModal: React.FC<AdminMailboxModalProps> = ({
   };
 
   const handleDelete = async (id: number) => {
+    if (!authToken) return;
     if (!confirm('Deseja realmente apagar esta mensagem da caixa postal?')) return;
 
     try {
       await fetch(`/api/admin/messages/${id}`, {
         method: 'DELETE',
         headers: {
-          'x-admin-user': currentUser?.username || '',
-          'x-admin-role': currentUser?.role || '',
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
